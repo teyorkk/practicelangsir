@@ -1,6 +1,6 @@
 package com.example.practicelangsir.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +10,6 @@ import lombok.Data;
 public class Order {
     private int id;
     private String customerEmail;
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
     private double totalAmount;
 }

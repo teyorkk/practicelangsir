@@ -2,6 +2,7 @@ package com.example.practicelangsir.repository.impl;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                     return Optional.of(Order.builder()
                             .id(rs.getInt("id"))
                             .customerEmail(rs.getString("customer_email"))
-                            .orderDate(rs.getObject("order_date", java.time.LocalDate.class))
+                            .orderDate(rs.getObject("order_date", java.time.LocalDateTime.class))
                             .totalAmount(rs.getDouble("total_amount"))
                             .build());
                 }
@@ -76,8 +77,28 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findByCustomerEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByCustomerEmail'");
+        String sql = "SELECT * FROM orders WHERE customer_email = ?";
+        List<Order> orders = new ArrayList<>();
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+
+            try (var rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    orders.add(Order.builder()
+                            .id(rs.getInt("id"))
+                            .customerEmail(rs.getString("customer_email"))
+                            .orderDate(rs.getObject("order_date", java.time.LocalDateTime.class))
+                            .totalAmount(rs.getDouble("total_amount"))
+                            .build());
+
+                }
+
+            }
+            return orders;
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+        }
     }
 
     @Override
