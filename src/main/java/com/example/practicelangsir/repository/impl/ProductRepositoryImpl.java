@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.sql.Statement;
 
 import com.example.practicelangsir.config.DatabaseConfig;
 import com.example.practicelangsir.model.Product;
@@ -12,15 +13,15 @@ import com.example.practicelangsir.repository.ProductRepository;
 public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
-    public void save(Product product) {
+    public boolean save(Product product) {
         String sql = "INSERT INTO products (name,price,stock_quantity) VALUES (?,?,?)";
         try (var conn = DatabaseConfig.getConnection();
-                var pstmt = conn.prepareStatement(sql)) {
+                var pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, product.getName());
             pstmt.setDouble(2, product.getPrice());
             pstmt.setInt(3, product.getStockquantity());
 
-            pstmt.executeUpdate();
+            int holder = pstmt.executeUpdate();
 
             try (var rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -28,6 +29,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                     product.setId(generatedId);
                 }
             }
+            return holder > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("DB ERROR: " + e.getMessage());
@@ -64,8 +66,8 @@ public class ProductRepositoryImpl implements ProductRepository {
         String sql = "SELECT * FROM products";
         List<Product> products = new ArrayList<>();
         try (var conn = DatabaseConfig.getConnection();
-                var stmt = conn.createStatement();
-                var rs = stmt.executeQuery(sql)) {
+                var pstmt = conn.createStatement();
+                var rs = pstmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Product product = Product.builder()
@@ -85,21 +87,50 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public void update(Product product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public boolean update(Product product) {
+        String sql = "UPDATE products SET name = ? , price = ?, stock_quantity = ? WHERE id = ?";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, product.getName());
+            pstmt.setDouble(2, product.getPrice());
+            pstmt.setInt(3, product.getStockquantity());
+            pstmt.setInt(4, product.getId());
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+
+        }
     }
 
     @Override
     public boolean updateStock(int productId, int quantityChange) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateStock'");
+        String sql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, quantityChange);
+            pstmt.setInt(2, productId);
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+
+        }
     }
 
     @Override
     public boolean deleteById(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        String sql = "DELETE FROM products WHERE id= ?";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+
+        }
     }
 
 }
