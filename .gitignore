@@ -1,0 +1,28 @@
+# Maven build output
+/target/
+
+# Java compiled classes and archives
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# IDE/editor files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
