@@ -9,9 +9,9 @@ public interface OrderRepository {
 
     Optional<Order> findById(int id);
 
-    int createOrder(Order order);
+    boolean createOrder(Order order);
 
-    void saveOrderItem(OrderItem item);
+    boolean saveOrderItem(OrderItem item);
 
     List<Order> findByCustomerEmail(String email);
 
