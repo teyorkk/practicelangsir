@@ -1,5 +1,12 @@
 package com.example.practicelangsir.dto;
 
-public class OrderItemDetailsDTO {
+import lombok.Builder;
+import lombok.Getter;
 
+@Getter
+@Builder
+public class OrderItemDetailsDTO {
+    private final String productName;
+    private final int quantity;
+    private final double subtotal;
 }

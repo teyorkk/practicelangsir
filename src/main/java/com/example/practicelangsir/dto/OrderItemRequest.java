@@ -1,5 +1,10 @@
 package com.example.practicelangsir.dto;
 
-public record OrderItemRequest() {
+import lombok.Builder;
+import lombok.Getter;
 
+@Getter
+@Builder
+public class OrderItemRequest {
+    private final int productId, quantity;
 }

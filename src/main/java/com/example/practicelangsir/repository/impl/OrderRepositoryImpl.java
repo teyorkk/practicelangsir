@@ -58,8 +58,20 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public boolean saveOrderItem(OrderItem item) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveOrderItem'");
+        String sql = "INSERT INTO order_items (order_id, product_id, quantity, subtotal) VALUES (?, ?, ?, ?)";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, item.getOrderId());
+            pstmt.setInt(2, item.getProductId());
+            pstmt.setInt(3, item.getQuantity());
+            pstmt.setDouble(4, item.getSubtotal());
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+        }
     }
 
     @Override

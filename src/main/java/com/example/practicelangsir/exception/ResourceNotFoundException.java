@@ -1,5 +1,7 @@
 package com.example.practicelangsir.exception;
 
-public class ResourceNotFoundException {
-
+public class ResourceNotFoundException extends OrderException {
+    public ResourceNotFoundException(String resourceName, Object id) {
+        super(resourceName + " not found with id: " + id);
+    }
 }
