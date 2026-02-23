@@ -8,4 +8,5 @@ import lombok.Data;
 public class OrderItem {
     private int orderId, productId, quantity;
     private double subtotal;
+    private String productName;
 }

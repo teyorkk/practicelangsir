@@ -103,14 +103,41 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<OrderItem> findItemsByOrderId(int orderId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findItemsByOrderId'");
+        String sql = "SELECT oi.*, p.name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?";
+        List<OrderItem> items = new ArrayList<>();
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, orderId);
+
+            try (var rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    items.add(OrderItem.builder()
+                            .orderId(rs.getInt("order_id"))
+                            .productId(rs.getInt("product_id"))
+                            .quantity(rs.getInt("quantity"))
+                            .subtotal(rs.getDouble("subtotal"))
+                            .productName(rs.getString("name"))
+                            .build());
+                }
+
+            }
+            return items;
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+        }
     }
 
     @Override
     public boolean deleteById(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        String sql = "DELETE FROM orders WHERE id = ? ";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+        }
     }
 
 }
