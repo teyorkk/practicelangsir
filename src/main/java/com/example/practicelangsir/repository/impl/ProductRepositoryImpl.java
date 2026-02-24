@@ -133,18 +133,23 @@ public class ProductRepositoryImpl implements ProductRepository {
         }
     }
 
-    public boolean existByName(String name) {
-        String sql = "SELECT name from products WHERE name = ?";
+    public String existByName(String name) {
+        String sql = "SELECT name FROM products WHERE name = ? LIMIT 1";
+
         try (var conn = DatabaseConfig.getConnection();
                 var pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, name);
 
             try (var rs = pstmt.executeQuery()) {
-                return rs.next();
+                if (rs.next()) {
+                    return rs.getString("name"); // return actual name
+                }
+                return null; // not found
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("DB ERROR: " + e.getMessage());
 
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage(), e);
         }
     }
 

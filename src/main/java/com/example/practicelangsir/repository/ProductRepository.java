@@ -17,5 +17,5 @@ public interface ProductRepository {
 
     boolean deleteById(int id);
 
-    boolean existByName(String name);
+    String existByName(String name);
 }
