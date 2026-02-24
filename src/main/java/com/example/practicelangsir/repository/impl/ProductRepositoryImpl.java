@@ -133,4 +133,19 @@ public class ProductRepositoryImpl implements ProductRepository {
         }
     }
 
+    public boolean existByName(String name) {
+        String sql = "SELECT name from products WHERE name = ?";
+        try (var conn = DatabaseConfig.getConnection();
+                var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+
+            try (var rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("DB ERROR: " + e.getMessage());
+
+        }
+    }
+
 }

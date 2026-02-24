@@ -3,6 +3,7 @@ package com.example.practicelangsir.repository.impl;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,7 +96,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 }
 
             }
-            return orders;
+            return Collections.unmodifiableList(orders);
         } catch (SQLException e) {
             throw new RuntimeException("DB ERROR: " + e.getMessage());
         }
@@ -121,7 +122,8 @@ public class OrderRepositoryImpl implements OrderRepository {
                 }
 
             }
-            return items;
+            return Collections.unmodifiableList(items);
+
         } catch (SQLException e) {
             throw new RuntimeException("DB ERROR: " + e.getMessage());
         }

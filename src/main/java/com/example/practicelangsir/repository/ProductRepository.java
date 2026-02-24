@@ -16,4 +16,6 @@ public interface ProductRepository {
     boolean updateStock(int productId, int quantityChange);
 
     boolean deleteById(int id);
+
+    boolean existByName(String name);
 }
