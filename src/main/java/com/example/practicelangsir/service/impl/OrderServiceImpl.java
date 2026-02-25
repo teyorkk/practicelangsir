@@ -77,14 +77,34 @@ public class OrderServiceImpl implements OrderService {
                 .customerEmail(request.getCustomerEmail())
                 .items(orderItemDetailsDTO)
                 .totalAmount(totalprice)
+                .orderDate(java.time.LocalDateTime.now().toString())
                 .build();
 
     }
 
     @Override
     public Optional<OrderResponse> getOrderDetails(int orderId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrderDetails'");
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with this ID not found"));
+
+        List<OrderItem> orderItems = orderRepo.findItemsByOrderId(orderId);
+
+        List<OrderItemDetailsDTO> itemsDto = orderItems.stream()
+                .map(item -> OrderItemDetailsDTO.builder()
+                        .productName(item.getProductName())
+                        .quantity(item.getQuantity())
+                        .subtotal(item.getSubtotal())
+                        .build())
+                .toList();
+
+        return Optional.of(OrderResponse.builder()
+                .id(order.getId())
+                .customerEmail(order.getCustomerEmail())
+                .orderDate(order.getOrderDate().toString())
+                .totalAmount(order.getTotalAmount())
+                .items(itemsDto)
+                .build());
     }
 
     @Override
@@ -92,6 +112,9 @@ public class OrderServiceImpl implements OrderService {
 
         List<Order> orders = orderRepo.findByCustomerEmail(email);
 
+        if (orders.isEmpty()) {
+            throw new ResourceNotFoundException("Orders by this customer not found");
+        }
         return orders.stream().map(order -> {
 
             List<OrderItem> orderItems = orderRepo.findItemsByOrderId(order.getId());
@@ -116,7 +139,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void cancelOrder(int orderId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'cancelOrder'");
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item with this ID is not found"));
+        List<OrderItem> orderItems = orderRepo.findItemsByOrderId(orderId);
+
+        for (OrderItem item : orderItems) {
+            productRepo.updateStock(item.getProductId(), item.getQuantity());
+
+        }
+        orderRepo.deleteById(order.getId());
     }
 }
