@@ -22,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getStockQuantity() <= 0) {
             throw new IllegalArgumentException("Stock should not be 0 or negative");
         }
-        if (repo.existByName(dto.getName()).isEmpty()) {
+        if (repo.existByName(dto.getName()) != null) {
             throw new RuntimeException("This product is already in our system");
         }
 
