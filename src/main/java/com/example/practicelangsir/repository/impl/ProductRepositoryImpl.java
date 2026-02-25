@@ -143,9 +143,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 
             try (var rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("name"); // return actual name
+                    return rs.getString("name");
                 }
-                return null; // not found
+                return null;
             }
 
         } catch (SQLException e) {

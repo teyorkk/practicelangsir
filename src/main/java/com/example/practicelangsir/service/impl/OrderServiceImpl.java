@@ -89,8 +89,29 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponse> getOrdersByCustomer(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrdersByCustomer'");
+
+        List<Order> orders = orderRepo.findByCustomerEmail(email);
+
+        return orders.stream().map(order -> {
+
+            List<OrderItem> orderItems = orderRepo.findItemsByOrderId(order.getId());
+
+            List<OrderItemDetailsDTO> itemDetailsDTO = orderItems.stream()
+                    .map(item -> OrderItemDetailsDTO.builder()
+                            .productName(item.getProductName())
+                            .quantity(item.getQuantity())
+                            .subtotal(item.getSubtotal())
+                            .build())
+                    .toList();
+
+            return OrderResponse.builder()
+                    .id(order.getId())
+                    .customerEmail(order.getCustomerEmail())
+                    .orderDate(order.getOrderDate().toString())
+                    .totalAmount(order.getTotalAmount())
+                    .items(itemDetailsDTO)
+                    .build();
+        }).toList();
     }
 
     @Override
